@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,10 @@ import java.util.regex.Pattern;
 public class NPYReader {
 
     public static NPYObject readNpy(String npyFilePath) throws IOException {
+        Path filePath = Paths.get(npyFilePath);
+        System.out.println(filePath.getFileName());
+        String fileName = String.valueOf(filePath.getFileName());
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
         byte[] data = Files.readAllBytes(Paths.get(npyFilePath));
 
         // Parse header
@@ -57,7 +62,7 @@ public class NPYReader {
                     doubleList.add(buffer.getDouble());
                 }
                 //System.out.println("Data: " + Arrays.toString(doubleArray));
-                object = new NPYObject<Double>(dtype, shape, doubleList);
+                object = new NPYObject<Double>(fileName ,dtype, shape, doubleList);
                 break;
             case "<i4":
                 int[] intArray = new int[numElements];
@@ -67,7 +72,7 @@ public class NPYReader {
                     intList.add(buffer.getInt());
                 }
                 //System.out.println("Data: " + Arrays.toString(intArray));
-                object = new NPYObject<Integer>(dtype, shape, intList);
+                object = new NPYObject<Integer>(fileName,dtype, shape, intList);
 
                 break;
             case "<i8":
@@ -78,7 +83,7 @@ public class NPYReader {
                     longList.add(buffer.getLong());
                 }
                 //System.out.println("Data: " + Arrays.toString(longArray));
-                object = new NPYObject<Long>(dtype, shape, longList);
+                object = new NPYObject<Long>(npyFilePath, dtype, shape, longList);
                 break;
             case "<U7":
                 int stringLength = 7; // Number of characters in each Unicode string
@@ -94,7 +99,7 @@ public class NPYReader {
                     stringArray[i] = sb.toString().trim();
                 }
                 //System.out.println("Data: " + Arrays.toString(stringArray));
-                object = new NPYObject<String>(dtype, shape, List.of(stringArray));
+                object = new NPYObject<String>(fileName, dtype, shape, List.of(stringArray));
                 break;
             case "<U6":
                 stringLength = 6; // Number of characters in each Unicode string
@@ -110,7 +115,7 @@ public class NPYReader {
                     stringArray[i] = sb.toString().trim();
                 }
                 //System.out.println("Data: " + Arrays.toString(stringArray));
-                object = new NPYObject<String>(dtype, shape, List.of(stringArray));
+                object = new NPYObject<String>(fileName, dtype, shape, List.of(stringArray));
 
                 break;
             // Add more cases as needed for other dtypes
